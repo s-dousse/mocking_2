@@ -45,3 +45,62 @@ A group discussion based on reflections on the starter and main.
 Click an emoji to tell us.
 
 <!-- END GENERATED SECTION DO NOT EDIT -->
+
+
+***NOTES - Exercise 1 / Docking Station***
+
+we have:
+
+mock of two classes :
+MockWorkingBike => creates working bikes
+MockBrokenBike -> creates broken bikes
+
+# Failure/Error: allow_any_instance_of(DockingStation).to receive(:sample).and_return(working_bike)
+       DockingStation does not implement #sample
+
+stubbing sample method => allow(...)
+
+	- @bikes = [] implement #sample (not docking station)
+	allow(@bikes).to receive(:sample).and_return(true)
+
+RED ! NoMethodError:undefined method 'ancestors' for []:Array
+
+	-  @bikes is an array so Array class implement # sample
+	allow_any_instance_of(Array).to receive(:sample).and_return(true)
+
+RED ! NoMethodError: undefined method 'working?' for true:TrueClass
+
+	- #sample method should return a specific kind of bike:
+		or the @broken_bike
+		or the @working_bike
+	allow_any_instance_of(Array).to receive(:sample).and_return(@working_bike)
+
+GREEN :D all specs passed !
+
+
+REFACTORING: 
+make doubles for our "Mock" classes as they both have the same method
+	I want have one class only (Bike - fake use tag 'bike') which has one method working?
+	place it at the beginning of the DockingStation describe block
+
+class MockWorkingBike
+   def working?
+     true
+   end
+end
+
+becomes => let(:working_bike) { double("bike", working?: true) }
+
+class MockBrokenBike
+  def working?
+    false
+  end
+end
+
+becomes => let(:broken_bike) { double("bike", working?: false) }
+
+questions:
+we use a symbole in let() why?
+we use a normal var in the tests
+
+the stub allow(...) is only valid within an example/it block
