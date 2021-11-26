@@ -1,28 +1,14 @@
 require 'docking_station'
 
-class MockWorkingBike
-  def working?
-    true
-  end
-end
-
-class MockBrokenBike
-  def working?
-    false
-  end
-end
-
 describe DockingStation do
-  describe '#working_bike_count' do
-    before do
-      @bikes = []
-    end
+  let(:working_bike) { double("bike", working?: true) }
+  let(:broken_bike) { double("bike", working?: false) }
+  # @bikes = Array.new
 
+  describe '#working_bike_count' do
     context '1 working bike' do
       it "returns 1" do
-        
-        @bikes << MockWorkingBike.new
-        docking_station = DockingStation.new(@bikes)
+        docking_station = DockingStation.new([working_bike])
 
         expect(docking_station.working_bike_count).to eq(1)
       end
@@ -30,9 +16,7 @@ describe DockingStation do
 
     context '1 working bike, 1 broken bike' do
       it "returns 1" do
-        @bikes << MockWorkingBike.new
-        @bikes << MockBrokenBike.new
-        docking_station = DockingStation.new(@bikes)
+        docking_station = DockingStation.new([working_bike, broken_bike])
 
         expect(docking_station.working_bike_count).to eq(1)
       end
@@ -40,27 +24,22 @@ describe DockingStation do
   end
 
   describe '#random_bike_working?' do
-    before do
-        @bikes = []
-        @working_bike = MockWorkingBike.new
-        @broken_bike = MockBrokenBike.new
-      end
-
     context 'random bike is working' do
       it 'returns true' do
-        docking_station = DockingStation.new([@working_bike, @broken_bike])
-        allow_any_instance_of(Array).to receive(:sample).and_return(@working_bike)
+        docking_station = DockingStation.new([working_bike, broken_bike])
+
+        allow_any_instance_of(Array).to receive(:sample).and_return(working_bike)
+
         expect(docking_station.random_bike_working?).to eq(true)
       end
     end
 
     context 'random bike is broken' do
       it 'returns false' do
-        working_bike = MockWorkingBike.new
-        broken_bike = MockBrokenBike.new
-
         docking_station = DockingStation.new([working_bike, broken_bike])
-        allow_any_instance_of(Array).to receive(:sample).and_return(@broken_bike)
+
+        allow_any_instance_of(Array).to receive(:sample).and_return(broken_bike)
+
         expect(docking_station.random_bike_working?).to eq(false)
       end
     end
